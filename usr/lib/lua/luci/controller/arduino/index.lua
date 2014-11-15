@@ -113,6 +113,7 @@ end
 function http_error(code, text)
   luci.http.prepare_content("text/plain")
   luci.http.status(code)
+  luci.http.header("Access-Control-Allow-Origin","*");
   if text then
     luci.http.write(text)
   end
@@ -764,6 +765,7 @@ function storage_send_request()
     if json_response then
       sock:close()
       luci.http.status(200)
+      luci.http.header("Access-Control-Allow-Origin","*")
       if jsonp_callback then
         luci.http.prepare_content("application/javascript")
         luci.http.write(jsonp_callback)
@@ -791,6 +793,7 @@ function board_plain_socket()
   local function send_response(response_text, jsonp_callback)
     if not response_text then
       luci.http.status(500)
+      luci.http.header("Access-Control-Allow-Origin","*")
       return
     end
 
@@ -798,6 +801,7 @@ function board_plain_socket()
     if #rows == 1 or string.find(rows[1], "Status") ~= 1 then
       luci.http.prepare_content("text/plain")
       luci.http.status(200)
+      luci.http.header("Access-Control-Allow-Origin","*")
       luci.http.write(response_text)
       return
     end
@@ -819,7 +823,8 @@ function board_plain_socket()
         luci.http.header(key, value)
       end
     end
-
+    luci.http.header("Access-Control-Allow-Origin","*")
+ 
     local response_body = table.concat(rows, "\r\n", body_start_at_idx + 1)
     if content_type == "application/json" and jsonp_callback then
       local json = require("luci.json")
